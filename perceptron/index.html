@@ -70,7 +70,7 @@
             var test = Array.from(model.predict(tf.tensor2d(Array.from(imageData), [1, 784])).dataSync());
             test.forEach(function(el, ind) {
                 const element = document.querySelector('.number-' + ind + ' .bar');
-                element.style.height = Math.min(200, 150 * Math.max(0, el)) + 'px';
+                element.style.height = Math.min(180, 150 * Math.max(0, el)) + 'px';
             })
         }
     </script>
@@ -79,10 +79,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"></script>
 <script src="main.js"></script>
 
-<div style="float: left;">
+<div style="display: inline-block;">
     <canvas id="myCanvas" width="280" height="280" style="border:2px solid black;" ></canvas>
 </div>
-<div style="float: right;">
+<div style="display: inline-block;">
     <div class="number-container">
         <div style="display: inline-block; height: 200px;"></div>
         <div class="number-0">
@@ -225,13 +225,7 @@
     body {
         position: absolute;
         top: 0;
-        left: 50%;
-
-        -webkit-transform: translate(-50%, 0);
-        -moz-transform: translate(-50%, 0);
-        -ms-transform: translate(-50%, 0);
-        -o-transform: translate(-50%, 0);
-        transform: translate(-50%, 0);
+        width: 100%;
 
         background-color: #ecf0f1;
         color: #34495e;
