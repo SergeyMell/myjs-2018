@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Poser</title>
+
+    <script src="https://unpkg.com/@tensorflow/tfjs"></script>
+    <script src="https://unpkg.com/@tensorflow-models/posenet"></script>
+</head>
+
+<body>
+<img id="photo1" src="photo3.jpg" style="display: none" onload="drawImage(ctx1, this)"/>
+<img id="photo2" src="ninja2.jpg" style="display: none" onload="drawImage(ctx2, this)"/>
+
+<canvas id="canvas1" style="transform: scale(0.334); transform-origin: top left; position: absolute; top: 10px; left: 10px;"></canvas>
+<canvas id="canvas2" style="transform: scale(0.345); transform-origin: top left; position: absolute; top: 10px; left: 300px;"></canvas>
+
+<script>
+    function drawImage(ctx, img) {
+        console.log(img);
+        ctx.drawImage(img, 0, 0);
+    }
+
+    function initCanvas(img, index) {
+        const canvas = document.getElementById('canvas' + index);
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#FF0000";
+        ctx.strokeStyle = "#FF0000";
+        ctx.lineWidth = 8;
+        return ctx;
+    }
+
+    var imageElement1 = document.getElementById('photo1');
+    var imageElement2 = document.getElementById('photo2');
+
+    const ctx1 = initCanvas(imageElement1, 1);
+    const ctx2 = initCanvas(imageElement2, 2);
+
+    posenet.load().then(function (net) {
+        return Promise.all([net.estimateSinglePose(imageElement1), net.estimateSinglePose(imageElement2)])
+    }).then(function (poses) {
+        console.log(poses);
+
+        poses[0].keypoints.forEach(point => {
+            ctx1.fillRect(point.position.x - 8, point.position.y - 8, 16, 16);
+        });
+        drawPoly(ctx1, poses[0], "leftWrist", 'leftElbow', 'leftShoulder', 'rightShoulder', 'rightElbow', 'rightWrist');
+        drawPoly(ctx1, poses[0], "leftEye", 'nose', 'leftShoulder', 'leftHip', 'leftKnee', 'leftAnkle');
+        drawPoly(ctx1, poses[0], "rightEye", 'nose', 'rightShoulder', 'rightHip', 'rightKnee', 'rightAnkle');
+
+        poses[1].keypoints.forEach(point => {
+            ctx2.fillRect(point.position.x - 8, point.position.y - 8, 16, 16);
+        });
+        drawPoly(ctx2, poses[1], "leftWrist", 'leftElbow', 'leftShoulder', 'rightShoulder', 'rightElbow', 'rightWrist');
+        drawPoly(ctx2, poses[1], "leftEye", 'nose', 'leftShoulder', 'leftHip', 'leftKnee', 'leftAnkle');
+        drawPoly(ctx2, poses[1], "rightEye", 'nose', 'rightShoulder', 'rightHip', 'rightKnee', 'rightAnkle');
+
+    });
+
+    function drawPoly(ctx, pose, ...names) {
+        for (let i = 0; i < names.length - 1; i++) {
+            const start = pose.keypoints.find(p => p.part === names[i]);
+            const end = pose.keypoints.find(p => p.part === names[i + 1]);
+            ctx.moveTo(start.position.x, start.position.y);
+            ctx.lineTo(end.position.x, end.position.y);
+        }
+        ctx.stroke();
+    }
+</script>
+
+</body>
+</html>
